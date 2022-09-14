@@ -1,0 +1,88 @@
+// This function is used to turn the characters to lower case
+function lowerCase(grid, dictionary) {
+    for (let x = 0; x < grid.length; x++) {
+        for (let i = 0; i < grid[x].length; i++) {
+            grid[x][i] = grid[x][i].toLowerCase();
+        }
+    }
+    for (let x = 0; x < dictionary.length; x++) {
+        dictionary[x] = dictionary[x].toLowerCase();
+    }
+    }
+
+//returns true if word is valid
+function isValid(trie, word) {
+    for (let w of trie) {
+
+        if (w == word && word.length >= 3) {
+            return true;
+        } 
+    }
+    return false;
+}
+
+
+exports.findAllSolutions = function (grid, dictionary) {
+let tempSet = []; // creating a new array
+let solutions = []; // creating a new array to store the result
+
+for (let i = 0; i < grid.length; i++) { // loop through the grid 
+    if (grid[i].length != grid.length) { // check if the character length is not equal the grid length
+        return solutions;
+    }
+}
+if (grid == null || dictionary == null) { //checks of grid or dict is empty, if so return the empty list
+    return solutions;
+}
+
+lowerCase(grid, dictionary) // call the lower case function to change it all to lowercase
+let trie = new Set(dictionary); // building the trie to match each letter together to form an actual world in the dictionary
+
+for (let y = 0; y < grid.length; y++) {// looping through the grid
+    for (let x = 0; x < grid.length; x++) { 
+        let visited = new Array(grid.length).fill(false).map(() => new Array(grid.length).fill(false)); // mark whatever node has been visited
+        let word = []; // set word to be an empty list
+        wordFinder(word, grid, trie, x, y, visited, tempSet); //calling the word finder function
+    }
+}
+solutions = Array.from(tempSet);
+return solutions; // returns the result
+}
+
+function lastWord(trie, word) { 
+    for (let w of trie) {
+        if (w.substr(0, word.length) == word) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function wordFinder(word, grid, trie, a, b, visited, tempSet) { // This function finds all the words in the dictionary
+let neigbors = [[0, 1], [1, 1], [1, 0], [0, -1], [1, -1], [-1, -1], [-1, 0], [-1, 1]]; // cordinates for the directions you can go from a position
+if (a < 0 || a >= grid.length){ // check if y is the correct position, if not just return
+    return;
+}
+if (b >= grid.length || b < 0){ // check if x is the correct position, if not just return
+    return;
+}
+
+word += grid[a][b]; // add the word in those position to the list of words
+
+if (lastWord(trie, word)) { // check if the last word is valid and matches the words in the dictionary
+visited[a][b] = true;
+
+if (isValid(trie, word)) {
+    tempSet.push(word); // puts the word in the list of words if it's valid
+}
+for (let i = 0; i < 8; i++) {
+wordFinder(word, grid, trie, a + neigbors [i][0], b + neigbors [i][1], visited, tempSet);
+
+}
+}
+
+visited[a][b] = false;
+
+}
+
+
